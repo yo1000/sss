@@ -2,25 +2,29 @@
 package io.github.yo1000.sss.controller.page;
 
 import io.github.yo1000.sss.model.Memo;
+import io.github.yo1000.sss.service.MemoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Controller
 @RequestMapping("memo")
 public class MemoController {
+    private MemoService memoService;
+
+    @Autowired
+    public MemoController(MemoService memoService) {
+        this.memoService = memoService;
+    }
+
     @RequestMapping("")
     public String get(Model model) {
-        List<Map<String, Object>> items = new ArrayList<>();
-        Map<String, Object> item = new HashMap<>();
-        item.put("memo", "C3Memo");
-        item.put("author", "C3Author");
-        items.add(item);
+        List<Memo> items = new ArrayList<>();
+        items.add(getMemoService().takeMemo("C4Memo", "C4Author"));
 
         model.addAttribute("items", items);
         return "memo";
@@ -28,13 +32,10 @@ public class MemoController {
 
     @RequestMapping("param/{memo:[a-zA-Z0-9]+}")
     public String getParams(@PathVariable String memo,
-                            @RequestParam(required = false, defaultValue = "C3DefaultAuthor") String author,
+                            @RequestParam(required = false, defaultValue = "C4DefaultAuthor") String author,
                             Model model) {
         List<Memo> items = new ArrayList<>();
-        Memo item = new Memo();
-        item.setMemo(memo);
-        item.setAuthor(author);
-        items.add(item);
+        items.add(getMemoService().takeMemo(memo, author));
 
         model.addAttribute("items", items);
         return "memo";
@@ -48,5 +49,9 @@ public class MemoController {
 
         model.addAttribute("items", items);
         return "memo";
+    }
+
+    public MemoService getMemoService() {
+        return memoService;
     }
 }
