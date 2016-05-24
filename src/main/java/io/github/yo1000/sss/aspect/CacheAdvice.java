@@ -2,7 +2,6 @@
 package io.github.yo1000.sss.aspect;
 
 import io.github.yo1000.sss.config.CacheConfiguration;
-import io.github.yo1000.sss.model.Memo;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,36 +15,30 @@ import org.springframework.stereotype.Component;
 public class CacheAdvice {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheAdvice.class);
 
-    private CacheConfiguration.CacheStoreMap<String, Memo> cacheStoreMap;
+    private CacheConfiguration.CacheStoreMap<String, Object> cacheStoreMap;
 
     @Autowired
-    public CacheAdvice(CacheConfiguration.CacheStoreMap<String, Memo> cacheStoreMap) {
+    public CacheAdvice(CacheConfiguration.CacheStoreMap<String, Object> cacheStoreMap) {
         this.cacheStoreMap = cacheStoreMap;
     }
 
-    @Around(value = "io.github.yo1000.sss.aspect.RepositoryPointcut.findOneByKey(key)")
-    public Object cacheFind(ProceedingJoinPoint proceedingJoinPoint, String key) throws Throwable {
+    @Around(value = "io.github.yo1000.sss.aspect.RepositoryPointcut.findByAuthor(author)")
+    public Object cacheFind(ProceedingJoinPoint proceedingJoinPoint, String author) throws Throwable {
         LOGGER.info("getSignature().toLongString() " + proceedingJoinPoint.getSignature().toLongString());
 
-        if (getCacheStoreMap().containsKey(key)) {
+        if (getCacheStoreMap().containsKey(author)) {
             LOGGER.info("Cache hit");
-            return getCacheStoreMap().get(key);
+            return getCacheStoreMap().get(author);
         }
 
         LOGGER.info("Cache miss");
         Object returnValue = proceedingJoinPoint.proceed();
+        getCacheStoreMap().put(author, returnValue);
 
-        if (!(returnValue instanceof Memo)) {
-            return returnValue;
-        }
-
-        Memo memoValue = (Memo) returnValue;
-        getCacheStoreMap().put(key, memoValue);
-
-        return memoValue;
+        return returnValue;
     }
 
-    public CacheConfiguration.CacheStoreMap<String, Memo> getCacheStoreMap() {
+    public CacheConfiguration.CacheStoreMap<String, Object> getCacheStoreMap() {
         return cacheStoreMap;
     }
 }
