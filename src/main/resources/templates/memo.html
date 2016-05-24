@@ -32,8 +32,8 @@
     </div>
 </form>
 <ul>
-    <li th:each="m : ${models}"
-        th:text="${m.memo} + ${#strings.isEmpty(m.author) ? '' : ' @' + m.author}">memo text</li>
+    <li th:each="item : ${items}"
+        th:text="${item.memo} + ${#strings.isEmpty(item.author) ? '' : ' @' + item.author}">memo text</li>
 </ul>
 </body>
 </html>
