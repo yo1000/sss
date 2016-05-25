@@ -28,10 +28,11 @@ public class JdbcMemoRepository implements MemoRepository {
     @Override
     public List<Memo> find() {
         return getJdbcTemplate().query(
-                "SELECT MEMO, AUTHOR FROM MEMO ORDER BY CREATED ASC", (resultSet, i) -> {
+                "SELECT MEMO, AUTHOR, CREATED FROM MEMO ORDER BY CREATED DESC", (resultSet, i) -> {
                     Memo item = new Memo();
                     item.setMemo(resultSet.getString("MEMO"));
                     item.setAuthor(resultSet.getString("AUTHOR"));
+                    item.setCreated(resultSet.getDate("CREATED"));
                     return item;
                 });
     }
@@ -39,10 +40,11 @@ public class JdbcMemoRepository implements MemoRepository {
     @Override
     public List<Memo> findByAuthor(String author) {
         return getJdbcTemplate().query(
-                "SELECT MEMO, AUTHOR FROM MEMO WHERE AUTHOR = ? ORDER BY CREATED ASC", (resultSet, i) -> {
+                "SELECT MEMO, AUTHOR, CREATED FROM MEMO WHERE AUTHOR = ? ORDER BY CREATED DESC", (resultSet, i) -> {
                     Memo item = new Memo();
                     item.setMemo(resultSet.getString("MEMO"));
                     item.setAuthor(resultSet.getString("AUTHOR"));
+                    item.setCreated(resultSet.getDate("CREATED"));
                     return item;
                 }, author);
     }
